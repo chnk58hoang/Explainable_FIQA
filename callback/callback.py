@@ -8,7 +8,7 @@ class MyCallBack(pl.Callback):
         super().__init__()
         self.test_loader = test_loader
         self.val_loader = val_loader
-        self.mae = nn.L1Loss()
+        self.mae = nn.L1Loss(reduction='sum')
 
 
     def on_validation_end(self, trainer: "pl.Trainer", pl_module: "pl.LightningModule"):
