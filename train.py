@@ -19,8 +19,10 @@ class EXFIQA(pl.LightningModule):
         self.loss2 = nn.SmoothL1Loss()
         self.automatic_optimization = False
 
-    def forward(self, image):
+    def forward(self, image,sharp,illu):
         image = image.to(self._device)
+        sharp = sharp.to(self._device)
+        illu = illu.to(self._device)
         return self.model(image)
 
     def configure_optimizers(self):
@@ -39,7 +41,7 @@ class EXFIQA(pl.LightningModule):
         (opt1, opt2) = self.optimizers()
 
         image, sharp, illu = batch
-        _, pred_sharp, pred_illu = self.forward(image)
+        _, pred_sharp, pred_illu = self.forward(image,sharp,illu)
 
         opt1.zero_grad()
         loss1 = self.loss1(sharp, pred_sharp)
