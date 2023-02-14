@@ -90,4 +90,4 @@ if __name__ == '__main__':
 
     trainer.fit(module)
 
-    torch.save('model.pth')
+    torch.save(model,'model.pth')
