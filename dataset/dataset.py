@@ -20,5 +20,5 @@ class ExFIQA(Dataset):
         img_path = img_path.replace('/home/artorias/Downloads/archive/casia-webface/','/kaggle/input/casia-webface/casia-webface/')
         image = Image.open(img_path)
         image = self.image_transform(image)
-        return image, sharpness * 10, illu * 10
+        return image, sharpness, illu 
 
