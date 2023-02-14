@@ -14,7 +14,9 @@ class MyCallBack(pl.Callback):
     def on_validation_end(self, trainer: "pl.Trainer", pl_module: "pl.LightningModule"):
         sharp_mae = 0.0
         illu_mae = 0.0
+        count = 0
         for batch_idx, batch in tqdm(enumerate(self.val_loader)):
+            count += 1
             image, sharpness, illu = batch
             sharpness = sharpness.to(pl_module._device)
             illu = illu.to(pl_module._device)
@@ -22,6 +24,9 @@ class MyCallBack(pl.Callback):
 
             sharp_mae += self.mae(sharpness, pred_sharp)
             illu_mae += self.mae(illu, pred_illu)
+        
+        sharp_mae /= count
+        illu_mae /= count
 
         print('MAE for sharpness {}'.format(float(sharp_mae)))
         print('MAE for illumination {}'.format(float(illu_mae)))
