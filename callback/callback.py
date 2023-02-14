@@ -18,6 +18,8 @@ class MyCallBack(pl.Callback):
         for batch_idx, batch in tqdm(enumerate(self.val_loader)):
             image, sharpness, illu = batch
             num_samples += image.size(0)
+            sharpness = sharpness.to(pl_module._device)
+            illu = illu.to(pl_module._device)
             _, pred_sharp, pred_illu = pl_module(image,sharpness,illu)
 
             sharp_mae += self.mae(sharpness, pred_sharp)
@@ -37,7 +39,8 @@ class MyCallBack(pl.Callback):
             image, sharpness, illu = batch
             num_samples += image.size(0)
             _, pred_sharp, pred_illu = pl_module(image)
-
+            sharpness = sharpness.to(pl_module._device)
+            illu = illu.to(pl_module._device)
             sharp_mae += self.mae(sharpness, pred_sharp)
             illu_mae += self.mae(illu, pred_illu)
 
