@@ -66,7 +66,7 @@ class EXFIQA(pl.LightningModule):
 
 if __name__ == '__main__':
     dataframe = pd.read_csv('/kaggle/input/ex-fiqa-code/MYFIQA/newdata.csv')
-    dataframe = dataframe.sample(frac=1)
+    dataframe = dataframe.sample(frac=0.05)
     train_len = int(len(dataframe) * 0.8)
     valid_len = int(len(dataframe) * 0.9)
     # test_len = int(len(dataframe) * 0.2)
@@ -79,9 +79,9 @@ if __name__ == '__main__':
     valid_dataset = ExFIQA(df=valid_dataframe)
     test_dataset = ExFIQA(df=test_dataframe)
 
-    train_loader = DataLoader(train_dataset, batch_size=16, shuffle=True, num_workers=8)
-    val_loader = DataLoader(valid_dataset, batch_size=16, shuffle=False, num_workers=8)
-    test_loader = DataLoader(test_dataset, batch_size=16, shuffle=False, num_workers=8)
+    train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True, num_workers=8)
+    val_loader = DataLoader(valid_dataset, batch_size=32, shuffle=False, num_workers=8)
+    test_loader = DataLoader(test_dataset, batch_size=32, shuffle=False, num_workers=8)
 
     module = EXFIQA(model=model, train_loader=train_loader, val_loader=val_loader, device=torch.device('cuda'))
     callback = MyCallBack(val_loader, test_loader)
