@@ -26,8 +26,8 @@ class EXFIQA(pl.LightningModule):
         return self.model(image)
 
     def configure_optimizers(self):
-        optim1 = torch.optim.Adam(self.model.sharpness.parameters(), lr=1e-4)
-        optim2 = torch.optim.Adam(self.model.illumination.parameters(), lr=1e-4)
+        optim1 = torch.optim.Adam(self.model.sharpness.parameters(), lr=1e-2)
+        optim2 = torch.optim.Adam(self.model.illumination.parameters(), lr=1e-2)
 
         return optim1, optim2
 
