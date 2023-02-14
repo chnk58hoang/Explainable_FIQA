@@ -65,7 +65,7 @@ class EXFIQA(pl.LightningModule):
 
 
 if __name__ == '__main__':
-    dataframe = pd.read_csv('/kaggle/input/ex-fiqa-code/MYFIQA/newdata2.csv')
+    dataframe = pd.read_csv('/kaggle/input/ex-fiqa-code/newdata2.csv')
     dataframe = dataframe.sample(frac=1)
     train_len = int(len(dataframe) * 0.8)
     valid_len = int(len(dataframe) * 0.9)
