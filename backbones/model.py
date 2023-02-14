@@ -15,7 +15,6 @@ class Explainable_FIQA(nn.Module):
 
         for param in self.backbone.parameters():
             param.requires_grad = False
-
     def forward(self, x):
         feature,qs = self.backbone(x)
         sharpness = self.sharpness(qs/2-0.35)
