@@ -34,18 +34,19 @@ class MyCallBack(pl.Callback):
     def on_test_end(self, trainer: "pl.Trainer", pl_module: "pl.LightningModule"):
         sharp_mae = 0.0
         illu_mae = 0.0
-        num_samples = 0
-        for batch_idx, batch in enumerate(self.test_loader):
+        count = 0
+        for batch_idx, batch in tqdm(enumerate(self.test_loader)):
+            count += 1
             image, sharpness, illu = batch
-            num_samples += image.size(0)
-            _, pred_sharp, pred_illu = pl_module(image)
             sharpness = sharpness.to(pl_module._device)
             illu = illu.to(pl_module._device)
+            _, pred_sharp, pred_illu = pl_module(image,sharpness,illu)
+
             sharp_mae += self.mae(sharpness, pred_sharp)
             illu_mae += self.mae(illu, pred_illu)
-
-        sharp_mae /= num_samples
-        illu_mae /= num_samples
+        
+        sharp_mae /= count
+        illu_mae /= count
 
         print('MAE for sharpness {}'.format(float(sharp_mae)))
         print('MAE for illumination {}'.format(float(illu_mae)))
