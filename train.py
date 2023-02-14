@@ -41,6 +41,8 @@ class EXFIQA(pl.LightningModule):
         (opt1, opt2) = self.optimizers()
 
         image, sharp, illu = batch
+        sharp = sharp.to(self._device)
+        illu = illu.to(self._device)
         _, pred_sharp, pred_illu = self.forward(image,sharp,illu)
 
         opt1.zero_grad()
