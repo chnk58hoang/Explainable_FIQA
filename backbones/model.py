@@ -7,7 +7,7 @@ class Explainable_FIQA(nn.Module):
     def __init__(self):
         super().__init__()
         self.backbone = iresnet50()
-        self.backbone.load_state_dict(torch.load('/kaggle/input/ex-fiqa-code/MYFIQA/pretrained/backbone.pth', map_location='cuda'))
+        self.backbone.load_state_dict(torch.load('/kaggle/input/ex-fiqa-code/backbone.pth', map_location='cuda'))
         self.sharpness = nn.Linear(512, 1)
         self.illumination = nn.Linear(512, 1)
 
