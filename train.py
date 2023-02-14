@@ -20,6 +20,7 @@ class EXFIQA(pl.LightningModule):
         self.automatic_optimization = False
 
     def forward(self, image):
+        image = image.to(self._device)
         return self.model(image)
 
     def configure_optimizers(self):
