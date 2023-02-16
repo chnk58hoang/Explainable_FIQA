@@ -46,16 +46,15 @@ class EXFIQA(pl.LightningModule):
         _, pred_sharp, pred_illu = self.forward(image,sharp,illu)
 
         opt1.zero_grad()
-        loss1 = self.loss1(sharp, pred_sharp)
-        self.manual_backward(loss1)
-        opt1.step()
-
         opt2.zero_grad()
+        loss1 = self.loss1(sharp, pred_sharp)
         loss2 = self.loss2(illu, pred_illu)
-        self.manual_backward(loss2)
+        loss = loss1 + loss2
+        self.manual_backward(loss)
+        opt1.step()
         opt2.step()
 
-        return {'loss1': loss1, 'loss2': loss2}
+        return {'loss1': loss}
 
     def validation_step(self,batch,batch_idx):
         pass
