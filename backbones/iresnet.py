@@ -89,7 +89,6 @@ class IResNet(nn.Module):
         self.inplanes = 64
         self.dilation = 1
         self.use_se=use_se
-        self.qs=qs
         if replace_stride_with_dilation is None:
             replace_stride_with_dilation = [False, False, False]
         if len(replace_stride_with_dilation) != 3:
@@ -120,8 +119,6 @@ class IResNet(nn.Module):
         self.dropout = nn.Dropout(p=dropout, inplace=True)
         self.fc = nn.Linear(512 * block.expansion * self.fc_scale, num_features)
         self.features = nn.BatchNorm1d(num_features, eps=1e-05)
-        self.qs=nn.Linear(num_features,self.qs)
-
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
                 nn.init.normal_(m.weight, 0, 0.1)
@@ -175,8 +172,7 @@ class IResNet(nn.Module):
         x = self.fc(x.float() if self.fp16 else x)
 
         x = self.features(x)
-        qs = self.qs(x)
-        return x, qs
+        return x
 
 
 class IdentityIResNet(nn.Module):
