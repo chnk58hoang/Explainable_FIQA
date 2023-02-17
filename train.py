@@ -59,6 +59,7 @@ class EXFIQA(pl.LightningModule):
         self.manual_backward(loss3)
         opt3.step()
         sch3.step(loss3)
+        print(opt3.lr)
 
         return {'loss': loss3}
 
