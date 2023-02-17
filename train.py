@@ -37,7 +37,7 @@ class EXFIQA(pl.LightningModule):
         sch2 = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer=optim2, factor=0.5, patience=2)
         sch3 = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer=optim3, factor=0.5, patience=2)
 
-        return optim1, optim2
+        return [optim1, optim2, optim3], [sch1, sch2, sch3]
 
     def train_dataloader(self):
         return self.train_loader
@@ -46,23 +46,21 @@ class EXFIQA(pl.LightningModule):
         return self.val_loader
 
     def training_step(self, batch, batch_idx):
-        (opt1, opt2) = self.optimizers()
+        (opt1, opt2, opt3) = self.optimizers()
+        (sch1, sch2, sch3) = self.lr_schedulers()
 
-        image, sharp, illu = batch
+        image, sharp, illu, qscore = batch
         sharp = sharp.to(self._device)
         illu = illu.to(self._device)
-        _, pred_sharp, pred_illu = self.forward(image, sharp, illu)
+        qscore = qscore.to(self._device)
+        _, pred_sharp, pred_illu, pred_qscore = self.forward(image, sharp, illu, qscore)
 
-        opt1.zero_grad()
-        opt2.zero_grad()
-        loss1 = self.loss1(sharp, pred_sharp)
-        loss2 = self.loss2(illu, pred_illu)
-        loss = loss1 + loss2
-        self.manual_backward(loss)
-        opt1.step()
-        opt2.step()
+        loss3 = self.loss3(qscore, pred_qscore)
+        self.manual_backward(loss3)
+        opt3.step()
+        sch3.step(loss3)
 
-        return {'loss1': loss}
+        return {'loss': loss3}
 
     def validation_step(self, batch, batch_idx):
         pass
@@ -96,5 +94,6 @@ if __name__ == '__main__':
     trainer = pl.Trainer(max_epochs=20, callbacks=[callback, ], auto_lr_find=True, accelerator='gpu')
 
     trainer.fit(module)
+    trainer.test(module, test_loader)
 
     torch.save(model, 'model.pth')

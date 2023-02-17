@@ -16,7 +16,13 @@ class Explainable_FIQA(nn.Module):
         self.illumination = nn.Sequential(*[nn.LazyLinear(32), nn.LazyLinear(16), nn.LazyLinear(1)])
         self.quality = nn.Sequential(*[nn.LazyLinear(32), nn.LazyLinear(16), nn.LazyLinear(1)])
 
-        print("Freezing backbone's parameters...")
+        print("Freezing parameters...")
+        for param in self.sharpness.parameters():
+            param.requires_grad = False
+
+        for param in self.illumination.parameters():
+            param.requires_grad = False
+
 
     def forward(self, x):
         feature = self.backbone(x)
