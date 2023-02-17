@@ -18,9 +18,6 @@ class Explainable_FIQA(nn.Module):
 
         print("Freezing backbone's parameters...")
 
-        for param in self.backbone.parameters():
-            param.requires_grad = False
-
     def forward(self, x):
         feature = self.backbone(x)
         medium = self.medium(feature)
