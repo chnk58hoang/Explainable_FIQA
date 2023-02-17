@@ -2,6 +2,7 @@ from backbones.model import Explainable_FIQA
 from dataset.dataset import ExFIQA
 from torch.utils.data import DataLoader
 from callback.callback import MyCallBack
+from pytorch_lightning.callbacks import LearningRateMonitor
 import pytorch_lightning as pl
 import torch.nn as nn
 import pandas as pd
@@ -59,7 +60,6 @@ class EXFIQA(pl.LightningModule):
         self.manual_backward(loss3)
         opt3.step()
         sch3.step(loss3)
-        print(opt3.lr)
 
         return {'loss': loss3}
 
@@ -91,8 +91,9 @@ if __name__ == '__main__':
 
     module = EXFIQA(model=model, train_loader=train_loader, val_loader=val_loader, device=torch.device('cuda'))
     callback = MyCallBack(val_loader, test_loader)
+    lr_monitor = LearningRateMonitor(logging_interval='step')
 
-    trainer = pl.Trainer(max_epochs=20, callbacks=[callback, ], auto_lr_find=True, accelerator='gpu')
+    trainer = pl.Trainer(max_epochs=20, callbacks=[callback, lr_monitor], auto_lr_find=True, accelerator='gpu')
 
     trainer.fit(module)
     trainer.test(module, test_loader)
