@@ -15,19 +15,27 @@ class EXFIQA(pl.LightningModule):
         self._device = device
         self.train_loader = train_loader
         self.val_loader = val_loader
-        self.loss1 = nn.SmoothL1Loss()
-        self.loss2 = nn.SmoothL1Loss()
+        self.loss1 = nn.L1Loss()
+        self.loss2 = nn.L1Loss()
+        self.loss3 = nn.L1Loss()
         self.automatic_optimization = False
 
-    def forward(self, image,sharp,illu):
+    def forward(self, image, sharp, illu, qscore):
         image = image.to(self._device)
         sharp = sharp.to(self._device)
         illu = illu.to(self._device)
+        qscore = qscore.to(self._device)
+
         return self.model(image)
 
     def configure_optimizers(self):
         optim1 = torch.optim.Adam(self.model.sharpness.parameters(), lr=1e-2)
         optim2 = torch.optim.Adam(self.model.illumination.parameters(), lr=1e-2)
+        optim3 = torch.optim.Adam(self.model.quality.parameters(), lr=1e-2)
+
+        sch1 = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer=optim1, factor=0.5, patience=2)
+        sch2 = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer=optim2, factor=0.5, patience=2)
+        sch3 = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer=optim3, factor=0.5, patience=2)
 
         return optim1, optim2
 
@@ -43,7 +51,7 @@ class EXFIQA(pl.LightningModule):
         image, sharp, illu = batch
         sharp = sharp.to(self._device)
         illu = illu.to(self._device)
-        _, pred_sharp, pred_illu = self.forward(image,sharp,illu)
+        _, pred_sharp, pred_illu = self.forward(image, sharp, illu)
 
         opt1.zero_grad()
         opt2.zero_grad()
@@ -56,7 +64,7 @@ class EXFIQA(pl.LightningModule):
 
         return {'loss1': loss}
 
-    def validation_step(self,batch,batch_idx):
+    def validation_step(self, batch, batch_idx):
         pass
 
     def test_step(self):
@@ -85,8 +93,8 @@ if __name__ == '__main__':
     module = EXFIQA(model=model, train_loader=train_loader, val_loader=val_loader, device=torch.device('cuda'))
     callback = MyCallBack(val_loader, test_loader)
 
-    trainer = pl.Trainer(max_epochs=20, callbacks=[callback, ], auto_lr_find=True,accelerator='gpu')
+    trainer = pl.Trainer(max_epochs=20, callbacks=[callback, ], auto_lr_find=True, accelerator='gpu')
 
     trainer.fit(module)
 
-    torch.save(model,'model.pth')
+    torch.save(model, 'model.pth')
